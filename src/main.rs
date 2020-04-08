@@ -16,7 +16,7 @@ async fn main() {
         .map(|dice: String| {
             format!("critical: {}", dice)
         });
-    let routes = normal_roll.or(critical_roll);
+    let routes = warp::get().and(normal_roll.or(critical_roll));
     warp::serve(routes)
         .run(([127, 0, 0, 1], 3030))
         .await;
