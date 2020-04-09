@@ -1,3 +1,6 @@
+mod parse;
+
+use parse::ParseError;
 use warp::Filter;
 
 #[tokio::main]
@@ -17,6 +20,7 @@ async fn main() {
             format!("critical: {}", dice)
         });
     let routes = warp::get().and(normal_roll.or(critical_roll));
+
     warp::serve(routes)
         .run(([127, 0, 0, 1], 3030))
         .await;
