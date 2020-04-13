@@ -1,4 +1,5 @@
 mod parse;
+mod roll;
 
 use parse::ParseError;
 use warp::Filter;

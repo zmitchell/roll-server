@@ -9,7 +9,7 @@ pub(crate) enum ParseError {
     UnableToParse,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub(crate) enum DiceSize {
     D4,
     D6,
@@ -36,6 +36,20 @@ impl From<DiceSize> for NonZeroU8 {
             DiceSize::D12 => NonZeroU8::new(12).unwrap(),
             DiceSize::D20 => NonZeroU8::new(20).unwrap(),
             DiceSize::D100 => NonZeroU8::new(100).unwrap(),
+        }
+    }
+}
+
+impl From<DiceSize> for usize {
+    fn from(d: DiceSize) -> Self {
+        match d {
+            DiceSize::D4 => 4,
+            DiceSize::D6 => 6,
+            DiceSize::D8 => 8,
+            DiceSize::D10 => 10,
+            DiceSize::D12 => 12,
+            DiceSize::D20 => 20,
+            DiceSize::D100 => 100,
         }
     }
 }
