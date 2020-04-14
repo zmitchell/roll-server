@@ -120,7 +120,19 @@ mod test {
 
     #[test]
     fn parses_correct_dice_size() {
-        let cmd = parse_dice_str("4d100").unwrap();
+        let mut cmd = parse_dice_str("4d4").unwrap();
+        assert_eq!(DiceSize::D4, cmd.size);
+        cmd = parse_dice_str("4d6").unwrap();
+        assert_eq!(DiceSize::D6, cmd.size);
+        cmd = parse_dice_str("4d8").unwrap();
+        assert_eq!(DiceSize::D8, cmd.size);
+        cmd = parse_dice_str("4d10").unwrap();
+        assert_eq!(DiceSize::D10, cmd.size);
+        cmd = parse_dice_str("4d12").unwrap();
+        assert_eq!(DiceSize::D12, cmd.size);
+        cmd = parse_dice_str("4d20").unwrap();
+        assert_eq!(DiceSize::D20, cmd.size);
+        cmd = parse_dice_str("4d100").unwrap();
         assert_eq!(DiceSize::D100, cmd.size);
     }
 }
