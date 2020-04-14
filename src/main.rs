@@ -1,7 +1,8 @@
 mod parse;
 mod roll;
 
-use parse::ParseError;
+use parse::{ParseError, parse_dice_str};
+use roll::{Roll, roll_normal, roll_crit};
 use warp::Filter;
 
 #[tokio::main]
@@ -12,13 +13,21 @@ async fn main() {
     let normal_roll = roll
         .and(dice_str)
         .map(|dice: String| {
-            format!("normal: {}", dice)
+            let cmd = parse_dice_str(dice.as_ref()).unwrap();
+            let rolls = roll_normal(&cmd);
+            let roll_str: String = rolls.dice.iter().map(|d| d.to_string()).collect::<Vec<String>>().join(" + ");
+            let resp = [roll_str, rolls.dice.iter().sum::<usize>().to_string()].join(" = ");
+            resp
         });
     let critical_roll = roll
         .and(crit)
         .and(dice_str)
         .map(|dice: String| {
-            format!("critical: {}", dice)
+            let cmd = parse_dice_str(dice.as_ref()).unwrap();
+            let rolls = roll_crit(&cmd);
+            let roll_str: String = rolls.dice.iter().map(|d| d.to_string()).collect::<Vec<String>>().join(" + ");
+            let resp = [roll_str, rolls.dice.iter().sum::<usize>().to_string()].join(" = ");
+            resp
         });
     let routes = warp::get().and(normal_roll.or(critical_roll));
 
