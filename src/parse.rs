@@ -37,20 +37,6 @@ pub(crate) struct RollCmd {
     pub size: DiceSize,
 }
 
-impl From<DiceSize> for NonZeroU8 {
-    fn from(d: DiceSize) -> Self {
-        match d {
-            DiceSize::D4 => NonZeroU8::new(4).unwrap(),
-            DiceSize::D6 => NonZeroU8::new(6).unwrap(),
-            DiceSize::D8 => NonZeroU8::new(8).unwrap(),
-            DiceSize::D10 => NonZeroU8::new(10).unwrap(),
-            DiceSize::D12 => NonZeroU8::new(12).unwrap(),
-            DiceSize::D20 => NonZeroU8::new(20).unwrap(),
-            DiceSize::D100 => NonZeroU8::new(100).unwrap(),
-        }
-    }
-}
-
 impl From<DiceSize> for usize {
     fn from(d: DiceSize) -> Self {
         match d {
