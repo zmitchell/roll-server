@@ -13,9 +13,15 @@ pub(crate) enum ParseError {
 impl From<ParseError> for BadRequest<String> {
     fn from(p: ParseError) -> Self {
         match p {
-            ParseError::InvalidDiceNumber => BadRequest(Some(String::from("Number of dice must be <= 255"))),
-            ParseError::InvalidDiceSize => BadRequest(Some(String::from("Dice size must be 4, 6, 8, 10, 12, 20, or 100"))),
-            ParseError::UnableToParse => BadRequest(Some(String::from("Unable to parse, must be of the form <number>d<size>")))
+            ParseError::InvalidDiceNumber => {
+                BadRequest(Some(String::from("Number of dice must be <= 255")))
+            }
+            ParseError::InvalidDiceSize => BadRequest(Some(String::from(
+                "Dice size must be 4, 6, 8, 10, 12, 20, or 100",
+            ))),
+            ParseError::UnableToParse => BadRequest(Some(String::from(
+                "Unable to parse, must be of the form <number>d<size>",
+            ))),
         }
     }
 }
@@ -62,7 +68,7 @@ impl FromStr for DiceSize {
             "12" => Ok(DiceSize::D12),
             "20" => Ok(DiceSize::D20),
             "100" => Ok(DiceSize::D100),
-            _ => Err(ParseError::InvalidDiceSize)
+            _ => Err(ParseError::InvalidDiceSize),
         }
     }
 }
@@ -70,18 +76,23 @@ impl FromStr for DiceSize {
 pub(crate) fn parse_dice_str(dice_str: &str) -> Result<RollCmd, ParseError> {
     // Unwrapping here is fine since we'll know at compile time whether this regular expression compiles.
     let dice_regex = Regex::new(r"^([1-9]\d*)d(\d+)$").unwrap();
-    let caps = dice_regex.captures(dice_str).ok_or(ParseError::UnableToParse)?;
-    let dice_num = caps.get(1)
+    let caps = dice_regex
+        .captures(dice_str)
+        .ok_or(ParseError::UnableToParse)?;
+    let dice_num = caps
+        .get(1)
         .ok_or(ParseError::InvalidDiceNumber)?
-        .as_str().parse::<NonZeroU8>()
-        .map_err(|_| {ParseError::InvalidDiceNumber})?;
-    let dice_size = caps.get(2)
+        .as_str()
+        .parse::<NonZeroU8>()
+        .map_err(|_| ParseError::InvalidDiceNumber)?;
+    let dice_size = caps
+        .get(2)
         .ok_or(ParseError::InvalidDiceSize)?
         .as_str()
         .parse::<DiceSize>()?;
     Ok(RollCmd {
         num: dice_num,
-        size: dice_size
+        size: dice_size,
     })
 }
 

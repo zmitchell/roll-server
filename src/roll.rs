@@ -1,5 +1,8 @@
-use rand::{thread_rng, distributions::{Distribution, Uniform}};
 use crate::parse::RollCmd;
+use rand::{
+    distributions::{Distribution, Uniform},
+    thread_rng,
+};
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct Rolls(pub Vec<usize>);
@@ -22,9 +25,8 @@ pub(crate) fn generate_rolls(cmd: &RollCmd) -> Vec<usize> {
     let mut rng = thread_rng();
     let distribution = Uniform::new_inclusive(1, usize::from(cmd.size));
     let rolls: Vec<usize> = (0..cmd.num.get())
-        .map(|_| {
-            distribution.sample(&mut rng).into()
-        }).collect();
+        .map(|_| distribution.sample(&mut rng).into())
+        .collect();
     rolls
 }
 
@@ -38,7 +40,7 @@ mod test {
     fn normal_rolls_are_nonzero() {
         let cmd = RollCmd {
             num: NonZeroU8::new(4).unwrap(),
-            size: DiceSize::D6
+            size: DiceSize::D6,
         };
         for _ in 0..100 {
             let rolls = roll_normal(&cmd);
@@ -51,7 +53,7 @@ mod test {
     fn critical_rolls_are_nonzero() {
         let cmd = RollCmd {
             num: NonZeroU8::new(4).unwrap(),
-            size: DiceSize::D6
+            size: DiceSize::D6,
         };
         for _ in 0..100 {
             let rolls = roll_crit(&cmd);
@@ -64,7 +66,7 @@ mod test {
     fn critical_rolls_higher_than_normal_rolls() {
         let cmd = RollCmd {
             num: NonZeroU8::new(4).unwrap(),
-            size: DiceSize::D6
+            size: DiceSize::D6,
         };
         for _ in 0..100 {
             let normal_rolls = roll_normal(&cmd);
@@ -79,7 +81,7 @@ mod test {
     fn critical_rolls_higher_than_max_damage() {
         let cmd = RollCmd {
             num: NonZeroU8::new(4).unwrap(),
-            size: DiceSize::D6
+            size: DiceSize::D6,
         };
         for _ in 0..100 {
             let rolls = roll_crit(&cmd);
@@ -92,7 +94,7 @@ mod test {
     fn no_normal_rolls_higher_than_dice_value() {
         let cmd = RollCmd {
             num: NonZeroU8::new(4).unwrap(),
-            size: DiceSize::D6
+            size: DiceSize::D6,
         };
         let mut dice = Vec::new();
         for _ in 0..100 {
@@ -106,7 +108,7 @@ mod test {
     fn critical_rolls_less_than_2x_full_damage() {
         let cmd = RollCmd {
             num: NonZeroU8::new(4).unwrap(),
-            size: DiceSize::D6
+            size: DiceSize::D6,
         };
         let mut random_rolls = Vec::new();
         for _ in 0..100 {
