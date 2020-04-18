@@ -1,37 +1,38 @@
 use rand::{thread_rng, distributions::{Distribution, Uniform}};
-use crate::parse::{RollCmd, DiceSize};
-use std::num::NonZeroU8;
+use crate::parse::RollCmd;
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct Rolls(pub Vec<usize>);
 
 pub(crate) fn roll_normal(cmd: &RollCmd) -> Rolls {
-    let mut rng = thread_rng();
-    let distribution = Uniform::new_inclusive(1, usize::from(cmd.size));
-    let mut rolls = Vec::new();
-    for _ in 0..cmd.num.get() {
-        rolls.push(distribution.sample(&mut rng).into());
-    }
+    let rolls = generate_rolls(cmd);
     Rolls(rolls)
 }
 
 pub(crate) fn roll_crit(cmd: &RollCmd) -> Rolls {
-    let mut rng = thread_rng();
-    let distribution = Uniform::new_inclusive(1, usize::from(cmd.size));
-    let mut rolls = Vec::new();
+    let mut rolls = generate_rolls(cmd);
     let num = usize::from(u8::from(cmd.num.get()));
     let size = usize::from(cmd.size);
     let crit = num.checked_mul(size).unwrap();
     rolls.push(crit);
-    for _ in 0..cmd.num.get() {
-        rolls.push(distribution.sample(&mut rng).into());
-    }
     Rolls(rolls)
+}
+
+pub(crate) fn generate_rolls(cmd: &RollCmd) -> Vec<usize> {
+    let mut rng = thread_rng();
+    let distribution = Uniform::new_inclusive(1, usize::from(cmd.size));
+    let rolls: Vec<usize> = (0..cmd.num.get())
+        .map(|_| {
+            distribution.sample(&mut rng).into()
+        }).collect();
+    rolls
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::parse::DiceSize;
+    use std::num::NonZeroU8;
 
     #[test]
     fn normal_rolls_are_nonzero() {

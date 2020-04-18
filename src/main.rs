@@ -4,8 +4,8 @@
 mod parse;
 mod roll;
 
-use parse::{ParseError, parse_dice_str};
-use roll::{Rolls, roll_normal, roll_crit};
+use parse::parse_dice_str;
+use roll::{roll_normal, roll_crit};
 use rocket::response::status::BadRequest;
 
 fn main() {
