@@ -1,4 +1,5 @@
 use regex::Regex;
+use rocket::response::status::BadRequest;
 use std::num::NonZeroU8;
 use std::str::FromStr;
 
@@ -7,6 +8,16 @@ pub(crate) enum ParseError {
     InvalidDiceNumber,
     InvalidDiceSize,
     UnableToParse,
+}
+
+impl From<ParseError> for BadRequest<String> {
+    fn from(p: ParseError) -> Self {
+        match p {
+            ParseError::InvalidDiceNumber => BadRequest(Some(String::from("Number of dice must be <= 255"))),
+            ParseError::InvalidDiceSize => BadRequest(Some(String::from("Dice size must be 4, 6, 8, 10, 12, 20, or 100"))),
+            ParseError::UnableToParse => BadRequest(Some(String::from("Unable to parse, must be of the form <number>d<size>")))
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -72,7 +83,7 @@ impl FromStr for DiceSize {
 
 pub(crate) fn parse_dice_str(dice_str: &str) -> Result<RollCmd, ParseError> {
     // Unwrapping here is fine since we'll know at compile time whether this regular expression compiles.
-    let dice_regex = Regex::new(r"^([1-9][\d]*)d(4|6|8|10|12|20|100)$").unwrap();
+    let dice_regex = Regex::new(r"^([1-9]\d*)d(\d+)$").unwrap();
     let caps = dice_regex.captures(dice_str).ok_or(ParseError::UnableToParse)?;
     let dice_num = caps.get(1)
         .ok_or(ParseError::InvalidDiceNumber)?
@@ -109,7 +120,7 @@ mod test {
 
     #[test]
     fn rejects_invalid_dice_size() {
-        assert_eq!(parse_dice_str("4d23"), Err(ParseError::UnableToParse));
+        assert_eq!(parse_dice_str("4d23"), Err(ParseError::InvalidDiceSize));
     }
 
     #[test]
